@@ -17,7 +17,16 @@ func getLeads(c *fiber.Ctx) {
 func getLead(c *fiber.Ctx) {
 	id, _ := strconv.ParseInt(c.Params("id"), 0, 0)
 
-	if err := c.Status(fiber.StatusOK).JSON(lead.GetLead(id)); err != nil {
+	l := lead.GetLead(id)
+	if l.Name == "" {
+		errJSON := map[string]string{
+			"message": "Lead Not found",
+		}
+		c.Status(fiber.StatusNotFound).JSON(errJSON)
+		return
+	}
+
+	if err := c.Status(fiber.StatusOK).JSON(l); err != nil {
 		handleError(err)
 	}
 }
